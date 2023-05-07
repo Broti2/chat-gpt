@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatbot</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.js"></script>
+</head>
+<body>
+    <h1>Chatbot</h1>
+    <div id="chat-container"></div>
+    <input type="text" id="user-input" placeholder="Type your message..." autofocus />
+    <button id="send-button">Send</button>
+    
+    <script>
+        $(document).ready(function() {
+            var chatContainer = $('#chat-container');
+            var userInput = $('#user-input');
+            var sendButton = $('#send-button');
+            var socket = io();
+            
+            sendButton.click(function() {
+                var message = userInput.val();
+                if (message !== '') {
+                    chatContainer.append('<p><strong>You:</strong> ' + message + '</p>');
+                    userInput.val('');
+                    
+                    socket.emit('message', { 'data': message });
+                }
+            });
+            
+            socket.on('response', function(response) {
+                var completion = response.message;
+                chatContainer.append('<p><strong>Chatbot:</strong> ' + completion + '</p>');
+                chatContainer.scrollTop(chatContainer[0].scrollHeight);
+            });
+            
+            userInput.keypress(function(e) {
+                if (e.which === 13) {
+                    sendButton.click();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
